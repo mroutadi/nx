@@ -2,7 +2,7 @@ import { ModuleFederationConfig } from '@nrwl/devkit';
 import { readCachedProjectConfiguration } from 'nx/src/project-graph/project-graph';
 import { getModuleFederationConfig } from './utils';
 import ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
-import type { AsyncNxWebpackPlugin, NxWebpackPlugin } from '@nrwl/webpack';
+import type { AsyncNxWebpackPlugin } from '@nrwl/webpack';
 
 function determineRemoteUrl(remote: string) {
   const remoteConfiguration = readCachedProjectConfiguration(remote);

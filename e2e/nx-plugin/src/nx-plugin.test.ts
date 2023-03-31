@@ -2,7 +2,6 @@ import { ProjectConfiguration } from '@nrwl/devkit';
 import {
   checkFilesExist,
   expectTestsPass,
-  isNotWindows,
   killPorts,
   newProject,
   readJson,
@@ -12,8 +11,6 @@ import {
   uniq,
   updateFile,
   createFile,
-  readFile,
-  removeFile,
   cleanupProject,
   runCommand,
   getPackageManagerCommand,
@@ -68,11 +65,6 @@ describe('Nx Plugin', () => {
     });
   }, 90000);
 
-  // the test invoke ensureNxProject, which points to @nrwl/workspace collection
-  // which walks up the directory to find it in the next repo itself, so it
-  // doesn't use the collection we are building
-  // we should change it to point to the right collection using relative path
-  // TODO: Re-enable this to work with pnpm
   it(`should run the plugin's e2e tests`, async () => {
     const plugin = uniq('plugin-name');
     runCLI(`generate @nrwl/nx-plugin:plugin ${plugin} --linter=eslint`);
@@ -410,5 +402,32 @@ describe('Nx Plugin', () => {
       const pluginProject = readProjectConfig(plugin);
       expect(pluginProject.tags).toEqual(['e2etag', 'e2ePackage']);
     }, 90000);
+  });
+
+  it('should be able to generate a create-package plugin ', async () => {
+    const plugin = uniq('plugin');
+    const createAppName = `create-${plugin}-app`;
+    runCLI(`generate @nrwl/nx-plugin:plugin ${plugin}`);
+    runCLI(
+      `generate @nrwl/nx-plugin:create-package ${createAppName} --project=${plugin}`
+    );
+
+    const buildResults = runCLI(`build ${createAppName}`);
+    expect(buildResults).toContain('Done compiling TypeScript files');
+
+    checkFilesExist(
+      `libs/${plugin}/src/generators/preset`,
+      `libs/${createAppName}`,
+      `dist/libs/${createAppName}/bin/index.js`
+    );
+  });
+
+  it('should throw an error when run create-package for an invalid plugin ', async () => {
+    const plugin = uniq('plugin');
+    expect(() =>
+      runCLI(
+        `generate @nrwl/nx-plugin:create-package ${plugin} --project=invalid-plugin`
+      )
+    ).toThrow();
   });
 });

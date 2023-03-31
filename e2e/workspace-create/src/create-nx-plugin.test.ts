@@ -16,11 +16,9 @@ describe('create-nx-plugin', () => {
 
   it('should be able to create a plugin repo and run plugin e2e', () => {
     const wsName = uniq('ws-plugin');
-    const pluginName = uniq('plugin');
 
     runCreatePlugin(wsName, {
       packageManager,
-      pluginName,
     });
 
     checkFilesExist(
@@ -30,6 +28,11 @@ describe('create-nx-plugin', () => {
       `generators.json`,
       `executors.json`
     );
+
+    runCLI(`build ${wsName}`);
+    checkFilesExist(`dist/src/index.js`);
+    runCLI(`build create-${wsName}-package`);
+    checkFilesExist(`dist/create-${wsName}-package/bin/index.js`);
 
     expect(() => runCLI(`e2e e2e`)).not.toThrow();
   });

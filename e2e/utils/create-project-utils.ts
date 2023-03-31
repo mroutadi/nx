@@ -215,7 +215,6 @@ export function runCreateWorkspace(
 export function runCreatePlugin(
   name: string,
   {
-    pluginName,
     packageManager,
     extraArgs,
     useDetectedPm = false,
@@ -234,9 +233,7 @@ export function runCreatePlugin(
     pm.runUninstalledPackage
   } create-nx-plugin@${getPublishedVersion()} ${name}`;
 
-  if (pluginName) {
-    command += ` --pluginName=${pluginName} --no-nxCloud`;
-  }
+  command += ` --no-nxCloud`;
 
   if (packageManager && !useDetectedPm) {
     command += ` --package-manager=${packageManager}`;
